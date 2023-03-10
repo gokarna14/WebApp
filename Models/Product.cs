@@ -12,7 +12,7 @@ namespace WebApp.Models
         public decimal Price { get; set; }
 
         public long CategoryId { get; set; }
-        public Category? category { get; set; }
+        public Category? Category { get; set; }
 
         public long SupplierId { get; set; }
         public Supplier? Supplier { get; set; }
