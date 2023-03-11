@@ -12,10 +12,12 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.EnableSensitiveDataLogging(true);
 });
 
-// builder.Services
+builder.Services.AddControllers();
 
 
 var app = builder.Build();
+
+app.MapControllers();
 
 const string baseUrl = "api/products";
 
