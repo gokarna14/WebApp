@@ -19,48 +19,48 @@ var app = builder.Build();
 
 app.MapControllers();
 
-const string baseUrl = "api/products";
+// const string baseUrl = "api/products";
 
-app.MapGet($"{baseUrl}/{{id}}", async (HttpContext context, DataContext data) =>
-{
-    string? id = context.Request.RouteValues["id"] as string;
+// app.MapGet($"{baseUrl}/{{id}}", async (HttpContext context, DataContext data) =>
+// {
+//     string? id = context.Request.RouteValues["id"] as string;
 
-    if (id != null)
-    {
-        Product? p = data.Products.Find(long.Parse(id));
+//     if (id != null)
+//     {
+//         Product? p = data.Products.Find(long.Parse(id));
 
-        if (p != null)
-        {
-            context.Response.StatusCode = StatusCodes.Status200OK;
-            context.Response.ContentType = "application/json";
+//         if (p != null)
+//         {
+//             context.Response.StatusCode = StatusCodes.Status200OK;
+//             context.Response.ContentType = "application/json";
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize<Product>(p));
-        }
-        else
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-        }
-    }
-});
+//             await context.Response.WriteAsync(JsonSerializer.Serialize<Product>(p));
+//         }
+//         else
+//         {
+//             context.Response.StatusCode = StatusCodes.Status404NotFound;
+//         }
+//     }
+// });
 
-app.MapGet(baseUrl, async (HttpContext context, DataContext data) =>
-{
-    context.Response.ContentType = "application/json";
-    await context.Response.WriteAsync(JsonSerializer.Serialize<IEnumerable<Product>>(data.Products));
-});
+// app.MapGet(baseUrl, async (HttpContext context, DataContext data) =>
+// {
+//     context.Response.ContentType = "application/json";
+//     await context.Response.WriteAsync(JsonSerializer.Serialize<IEnumerable<Product>>(data.Products));
+// });
 
-app.MapPost(baseUrl, async (HttpContext context, DataContext data) =>
-{
-    Product? p = await JsonSerializer.DeserializeAsync<Product>(context.Request.Body);
+// app.MapPost(baseUrl, async (HttpContext context, DataContext data) =>
+// {
+//     Product? p = await JsonSerializer.DeserializeAsync<Product>(context.Request.Body);
 
-    if (p != null)
-    {
-        await data.AddAsync(p);
-        await data.SaveChangesAsync();
+//     if (p != null)
+//     {
+//         await data.AddAsync(p);
+//         await data.SaveChangesAsync();
 
-        context.Response.StatusCode = StatusCodes.Status200OK;
-    }
-});
+//         context.Response.StatusCode = StatusCodes.Status200OK;
+//     }
+// });
 
 
 app.UseMiddleware<TestMiddleware>();
