@@ -8,22 +8,46 @@ namespace WebApp.Controllers
     [Route("api/[controller]")]
     public class ProductsController : Controller
     {
+        private DataContext dataContext;
+
+        public ProductsController(DataContext dataContext)
+        {
+            this.dataContext = dataContext;
+        }
+
         [HttpGet]
         public IEnumerable<Product> GetProducts()
         {
-            return new Product[]
-            {
-                new Product() {Name = "Product1"},
-                new Product() {Name = "Product2"}
-            };
+            return dataContext.Products;
         }
 
         [HttpGet("{id}")]
-        public Product GetProduct()
+        public Product? GetProduct(long id, [FromServices] ILogger<ProductsController> logger)
         {
-            return new Product {
-                ProductId = 1, Name = "Test Product"
-            };
+            logger.LogWarning("GetProduct Action Invoked");
+
+            return dataContext.Products.Find(id);
+        }
+
+        [HttpPost]
+        public void SaveProduct([FromBody] Product product){
+            dataContext.Products.Add(product);
+            dataContext.SaveChanges();
+        }
+
+        [HttpPut]
+        public void UpdateProduct([FromBody] Product product)
+        {
+            dataContext.Products.Update(product);
+            dataContext.SaveChanges();
+        }
+
+        [HttpDelete("{id}")]
+        public void DeleteProduct(long id, [FromServices] ILogger<ProductsController> logger)
+        {
+            dataContext.Products.Remove(new Product {ProductId = id});
+            dataContext.SaveChanges();
+            logger.LogWarning($"The product with id {id} deleted !");
         }
     }
 }
