@@ -22,17 +22,29 @@ namespace WebApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<Product?> GetProduct(long id, [FromServices] ILogger<ProductsController> logger)
+        public async Task<IActionResult> GetProduct(long id, [FromServices] ILogger<ProductsController> logger)
         {
             logger.LogWarning("GetProduct Action Invoked");
 
-            return await dataContext.Products.FindAsync(id);
+            Product? p = await dataContext.Products.FindAsync(id);
+
+            if (p == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(p);
         }
 
         [HttpPost]
-        public async Task SaveProduct([FromBody] ProductBindingTarget product){
-            await dataContext.Products.AddAsync(product.ToProduct());
+        public async Task<IActionResult> SaveProduct([FromBody] ProductBindingTarget product)
+        {
+            Product p = product.ToProduct();
+            await dataContext.Products.AddAsync(p);
             await dataContext.SaveChangesAsync();
+
+            //returns p as response as well
+            return Ok(p);
         }
 
         [HttpPut]
@@ -45,9 +57,33 @@ namespace WebApp.Controllers
         [HttpDelete("{id}")]
         public async Task DeleteProduct(long id)
         {
-            dataContext.Products.Remove(new Product {ProductId = id});
+            dataContext.Products.Remove(new Product { ProductId = id });
             await dataContext.SaveChangesAsync();
             // logger.LogWarning($"The product with id {id} deleted !");
+        }
+
+        [HttpGet("redirect")]
+        public IActionResult Redirect()
+        {
+            // return Redirect("/api/products/1");
+            return RedirectToAction(nameof(GetProduct), new { Id = 1 });
+        }
+
+        [HttpGet("redirect/{id}")]
+        public IActionResult Redirect(long id)
+        {
+            // return Redirect("/api/products/1");
+            return RedirectToAction(nameof(GetProduct), new { Id = id });
+        }
+        [HttpGet("redirectWithRoute")]
+        public IActionResult RedirectWithRoute()
+        {
+            return RedirectToRoute(new
+            {
+                controller = "Products",
+                action = "GetProduct",
+                Id = 1
+            });
         }
     }
 }
