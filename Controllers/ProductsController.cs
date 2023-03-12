@@ -16,38 +16,38 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Product> GetProducts()
+        public IAsyncEnumerable<Product> GetProducts()
         {
-            return dataContext.Products;
+            return dataContext.Products.AsAsyncEnumerable();
         }
 
         [HttpGet("{id}")]
-        public Product? GetProduct(long id, [FromServices] ILogger<ProductsController> logger)
+        public async Task<Product?> GetProduct(long id, [FromServices] ILogger<ProductsController> logger)
         {
             logger.LogWarning("GetProduct Action Invoked");
 
-            return dataContext.Products.Find(id);
+            return await dataContext.Products.FindAsync(id);
         }
 
         [HttpPost]
-        public void SaveProduct([FromBody] Product product){
-            dataContext.Products.Add(product);
-            dataContext.SaveChanges();
+        public async Task SaveProduct([FromBody] ProductBindingTarget product){
+            await dataContext.Products.AddAsync(product.ToProduct());
+            await dataContext.SaveChangesAsync();
         }
 
         [HttpPut]
-        public void UpdateProduct([FromBody] Product product)
+        public async Task UpdateProduct([FromBody] Product product)
         {
             dataContext.Products.Update(product);
-            dataContext.SaveChanges();
+            await dataContext.SaveChangesAsync();
         }
 
         [HttpDelete("{id}")]
-        public void DeleteProduct(long id, [FromServices] ILogger<ProductsController> logger)
+        public async Task DeleteProduct(long id)
         {
             dataContext.Products.Remove(new Product {ProductId = id});
-            dataContext.SaveChanges();
-            logger.LogWarning($"The product with id {id} deleted !");
+            await dataContext.SaveChangesAsync();
+            // logger.LogWarning($"The product with id {id} deleted !");
         }
     }
 }
